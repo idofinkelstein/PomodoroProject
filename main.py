@@ -18,7 +18,8 @@ timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- #
 def reset_timer():
-    window.after_cancel(timer)
+    if timer is not None:
+        window.after_cancel(timer)
     canvas.itemconfig(timer_text, text="00:00")
     timer_label.config(text="Timer", fg=GREEN)
     checkmark_label.config(text="")
@@ -34,16 +35,15 @@ def start_timer():
     short_break_seconds = SHORT_BREAK_MIN * 60
     long_break_seconds = LONG_BREAK_MIN * 60
 
-    # count_down(work_seconds)
-    if reps % 8 == 0:
+    if (reps + 1) % 8 == 0:
         count_down(long_break_seconds)
-        timer_label.config(text="Work", fg=RED)
+        timer_label.config(text="Break", fg=RED)
     elif reps % 2 == 0:
-        count_down(short_break_seconds)
-        timer_label.config(text="Break", fg=PINK)
-    else:
         count_down(work_seconds)
         timer_label.config(text="Work", fg=GREEN)
+    else:
+        count_down(short_break_seconds)
+        timer_label.config(text="Break", fg=PINK)
     reps += 1
 
 
@@ -55,7 +55,7 @@ def count_down(counter):
     if counter > 0:
         global timer
         timer = window.after(1000, count_down, counter - 1)
-    elif reps <= 8:
+    elif reps < 8:
         start_timer()
         marks = ""
         for _ in range(reps // 2):
@@ -69,8 +69,6 @@ def count_down(counter):
 window = Tk()
 window.title("Pomodoro")
 window.config(width=220, height=240, padx=100, pady=100, bg=YELLOW)
-# count_down(5)
-# window.after(1000, count_down, 5)
 
 photo_image = PhotoImage(file="tomato.png")
 
@@ -84,7 +82,7 @@ timer_label = Label(text="Timer")
 timer_label.config(bg=YELLOW, fg=GREEN, font=(FONT_NAME, 40, "bold"))
 timer_label.grid(row=0, column=1)
 
-checkmark_label = Label(text=CHECKMARK)
+checkmark_label = Label(text="")
 checkmark_label.config(bg=YELLOW, fg=GREEN, font=(FONT_NAME, 20, "bold"))
 checkmark_label.grid(row=3, column=1)
 
